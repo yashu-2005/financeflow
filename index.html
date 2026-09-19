@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance & Expense Analyzer</title>
+    <meta name="description" content="Beginner-friendly personal finance dashboard to track income, expenses, monthly budgets, savings rates, and visual category analytics.">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-icon">₹</div>
+                <div class="brand-text">
+                    <h2>FinanceFlow</h2>
+                    <span>Personal Analyzer</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" data-view="dashboard-view" id="nav-dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-view="add-transaction-view" id="nav-add">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    <span>Add Transaction</span>
+                </button>
+                <button class="nav-item" data-view="transactions-view" id="nav-transactions">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    <span>Transactions</span>
+                </button>
+                <button class="nav-item" data-view="analytics-view" id="nav-analytics">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    <span>Analytics</span>
+                </button>
+                <button class="nav-item" data-view="budget-view" id="nav-budget">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                    <span>Budget & Savings</span>
+                </button>
+            </nav>
+
+            <div class="user-profile">
+                <div class="avatar">FS</div>
+                <div class="user-info">
+                    <p class="user-name">Fresher Student</p>
+                    <p class="user-role">Fresher Portfolio</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header Bar -->
+            <header class="top-header">
+                <div class="header-title">
+                    <h1 id="page-title">Financial Dashboard</h1>
+                    <p id="page-subtitle">Track income, spending habits, and monthly savings targets.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="btn-quick-add">+ Add Record</button>
+                </div>
+            </header>
+
+            <!-- Dynamic Alert Banner for Budget Status -->
+            <div id="budget-alert-banner" class="alert-banner hidden">
+                <span class="alert-icon">⚠️</span>
+                <span id="alert-message-text" class="alert-text">You have used 92% of your monthly budget.</span>
+            </div>
+
+            <!-- View 1: Dashboard View -->
+            <section id="dashboard-view" class="view-section active-view">
+                <!-- Summary Metrics Cards Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card card-income">
+                        <div class="card-header">
+                            <span class="card-label">Monthly Income</span>
+                            <span class="card-badge badge-green">Inflow</span>
+                        </div>
+                        <div class="card-value" id="val-income">₹0</div>
+                        <div class="card-footer">Total earnings this month</div>
+                    </div>
+
+                    <div class="metric-card card-expenses">
+                        <div class="card-header">
+                            <span class="card-label">Total Expenses</span>
+                            <span class="card-badge badge-red">Outflow</span>
+                        </div>
+                        <div class="card-value" id="val-expenses">₹0</div>
+                        <div class="card-footer">Total spending this month</div>
+                    </div>
+
+                    <div class="metric-card card-savings">
+                        <div class="card-header">
+                            <span class="card-label">Total Savings</span>
+                            <span class="card-badge badge-blue">Retained</span>
+                        </div>
+                        <div class="card-value" id="val-savings">₹0</div>
+                        <div class="card-footer">Savings Rate: <strong id="val-savings-rate">0%</strong></div>
+                    </div>
+
+                    <div class="metric-card card-budget">
+                        <div class="card-header">
+                            <span class="card-label">Monthly Budget</span>
+                            <span class="card-badge" id="val-budget-badge">Normal</span>
+                        </div>
+                        <div class="card-value" id="val-budget">₹0</div>
+                        <div class="budget-progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="val-budget-fill" style="width: 0%;"></div>
+                            </div>
+                            <span class="progress-text" id="val-budget-pct">0% Used</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights & Recent Activity Split Grid -->
+                <div class="dashboard-grid">
+                    <!-- Automated Financial Insights Card -->
+                    <div class="panel-card insight-panel">
+                        <div class="panel-header">
+                            <h3>Financial Insights Engine</h3>
+                            <span class="sparkle-icon">✨</span>
+                        </div>
+                        <div class="insight-content">
+                            <p class="insight-highlight" id="insight-main-text">Analyzing your financial records...</p>
+                            <ul class="insight-list">
+                                <li>Highest Spending Category: <strong id="insight-highest-cat">-</strong> (<span id="insight-highest-amt">₹0</span>)</li>
+                                <li>Lowest Spending Category: <strong id="insight-lowest-cat">-</strong> (<span id="insight-lowest-amt">₹0</span>)</li>
+                                <li>Average Daily Expense: <strong id="insight-avg-daily">₹0</strong></li>
+                                <li>Highest Single Expense: <strong id="insight-highest-single">₹0</strong></li>
+                                <li>Total Transactions Recorded: <strong id="insight-tx-count">0</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Quick Overview Chart Preview -->
+                    <div class="panel-card chart-preview-panel">
+                        <div class="panel-header">
+                            <h3>Category Spending Overview</h3>
+                        </div>
+                        <div class="chart-container-sm">
+                            <canvas id="dash-category-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View 2: Add Transaction View -->
+            <section id="add-transaction-view" class="view-section">
+                <div class="form-container-card">
+                    <div class="form-header">
+                        <h2>Record New Financial Transaction</h2>
+                        <p>Select income or expense, enter amount, category, and date.</p>
+                    </div>
+
+                    <form id="transaction-form" class="transaction-form">
+                        <div class="form-group">
+                            <label>Transaction Type</label>
+                            <div class="radio-toggle-group">
+                                <label class="radio-label active">
+                                    <input type="radio" name="txType" value="EXPENSE" checked id="radio-expense"> Expense
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="txType" value="INCOME" id="radio-income"> Income
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tx-amount">Amount (₹)</label>
+                                <input type="number" id="tx-amount" step="0.01" min="1" placeholder="e.g. 2500" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tx-date">Transaction Date</label>
+                                <input type="date" id="tx-date" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tx-category">Category / Source</label>
+                            <select id="tx-category" required>
+                                <!-- Populated dynamically based on INCOME vs EXPENSE -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tx-description">Description (Optional)</label>
+                            <input type="text" id="tx-description" placeholder="e.g. Grocery shopping at DMart">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-tx">Save Transaction</button>
+                            <button type="reset" class="btn btn-secondary btn-lg">Reset Form</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- View 3: Transaction History View -->
+            <section id="transactions-view" class="view-section">
+                <div class="table-card">
+                    <div class="table-toolbar">
+                        <div class="toolbar-title">
+                            <h2>Transaction History</h2>
+                            <span class="badge-count" id="table-record-count">0 Records</span>
+                        </div>
+                        <div class="toolbar-filters">
+                            <select id="filter-type" class="filter-select">
+                                <option value="ALL">All Types</option>
+                                <option value="INCOME">Income Only</option>
+                                <option value="EXPENSE">Expense Only</option>
+                            </select>
+                            <select id="filter-category" class="filter-select">
+                                <option value="ALL">All Categories</option>
+                                <option value="Food">Food</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Bills">Bills</option>
+                                <option value="Education">Education</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Salary">Salary</option>
+                                <option value="Freelancing">Freelancing</option>
+                            </select>
+                            <select id="sort-by" class="filter-select">
+                                <option value="date_desc">Date (Newest First)</option>
+                                <option value="date_asc">Date (Oldest First)</option>
+                                <option value="amount_desc">Amount (High to Low)</option>
+                                <option value="amount_asc">Amount (Low to High)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Category / Source</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transaction-table-body">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading transaction history...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View 4: Analytics View -->
+            <section id="analytics-view" class="view-section">
+                <div class="analytics-grid">
+                    <div class="panel-card chart-panel">
+                        <div class="panel-header">
+                            <h3>Category-Wise Spending Breakdown</h3>
+                            <span>Doughnut Visualization</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="category-doughnut-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="panel-card chart-panel">
+                        <div class="panel-header">
+                            <h3>6-Month Expense Trends</h3>
+                            <span>Bar / Line Visualization</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="monthly-trend-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View 5: Budget Management View -->
+            <section id="budget-view" class="view-section">
+                <div class="budget-layout">
+                    <div class="panel-card budget-form-card">
+                        <div class="panel-header">
+                            <h3>Set Monthly Budget Target</h3>
+                        </div>
+                        <form id="budget-form" class="budget-form">
+                            <div class="form-group">
+                                <label for="budget-amount">Monthly Target Budget (₹)</label>
+                                <input type="number" id="budget-amount" step="100" min="1000" placeholder="e.g. 30000" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Update Monthly Budget</button>
+                        </form>
+                    </div>
+
+                    <div class="panel-card budget-status-card">
+                        <div class="panel-header">
+                            <h3>Budget Threshold & Status Rules</h3>
+                        </div>
+                        <div class="rules-list">
+                            <div class="rule-item rule-normal">
+                                <span class="rule-badge">Below 70%</span>
+                                <span class="rule-desc">Normal spending state. Healthy budget management.</span>
+                            </div>
+                            <div class="rule-item rule-warning">
+                                <span class="rule-badge">70% - 90%</span>
+                                <span class="rule-desc">Warning state. Spending approaching target limit.</span>
+                            </div>
+                            <div class="rule-item rule-alert">
+                                <span class="rule-badge">Above 90%</span>
+                                <span class="rule-desc">Alert state. High risk of exceeding monthly target.</span>
+                            </div>
+                            <div class="rule-item rule-exceeded">
+                                <span class="rule-badge">Above 100%</span>
+                                <span class="rule-desc">Budget exceeded! Immediate spending adjustment recommended.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript Application -->
+    <script src="js/app.js"></script>
+</body>
+</html>
