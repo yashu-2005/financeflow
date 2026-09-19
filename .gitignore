@@ -1,0 +1,22 @@
+# Target build directory
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# Maven wrapper portable files
+.mvn/
+
+# IDE & Editor files
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS junk
+.DS_Store
+Thumbs.db
